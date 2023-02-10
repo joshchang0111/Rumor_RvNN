@@ -43,13 +43,13 @@ def parse_args():
 
 	## Others
 	parser.add_argument("--lr", type=float, default=0.005)
-	parser.add_argument("--Nepoch", type=int, default=200)
+	parser.add_argument("--Nepoch", type=int, default=100)
 	parser.add_argument("--Nclass", type=int, default=4)
 	parser.add_argument("--hidden_dim", type=int, default=100)
 	parser.add_argument("--vocabulary_size", type=int, default=5000)
 	parser.add_argument("--tag", type=str, default="_u2b")
 	parser.add_argument("--fold", type=str, default="2", help="fold index, choose from 0-4")
-	parser.add_argument("--obj", type=str, default="Twitter15", choices=["Twitter15", "Twitter16"])
+	parser.add_argument("--obj", type=str, default="Twitter15", choices=["Twitter15", "Twitter16", "semeval2019"])
 
 	args = parser.parse_args()
 
@@ -218,7 +218,12 @@ if __name__ == "__main__":
 	#lossPath = "../loss/loss-" + unit + ".txt"
 	#modelPath = "../param/param-" + unit + ".npz" 
 	
-	treePath   = "../resource/data.TD_RvNN.vol_" + str(args.vocabulary_size) + ".txt" 
+	if args.obj == "semeval2019":
+		treePath = "../resource/myData/{}/data.TD_RvNN.vol_{}.txt".format(args.obj, args.vocabulary_size)
+		evaluation_fct = evaluation_3class
+	else:
+		treePath = "../resource/data.TD_RvNN.vol_" + str(args.vocabulary_size) + ".txt" 
+		evaluation_fct = evaluation_4class
 	#trainPath  = "../nfold/RNNtrainSet_" + args.obj + str(args.fold) + "_tree.txt" 
 	#testPath   = "../nfold/RNNtestSet_" + args.obj + str(args.fold) + "_tree.txt"
 	trainPath  = "../resource/myData/{}/split_{}/train.txt".format(args.obj, args.fold)
@@ -229,7 +234,7 @@ if __name__ == "__main__":
 	if not os.path.isfile(resultPath):
 		f_res = open(resultPath, "w")
 		f_res.write("{:4s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\t{:6s}\n".format(
-			"Fold", "Acc." , "microF", 
+			"Fold", "Acc." , "macroF", 
 			"Acc1", "Prec1", "Recll1", "F1",
 			"Acc2", "Prec2", "Recll2", "F2",
 			"Acc3", "Prec3", "Recll3", "F3",
@@ -323,7 +328,8 @@ if __name__ == "__main__":
 			for j in tqdm(range(len(y_test)), desc="evaluate"):
 				#print j
 				prediction.append(model.predict_up(word_test[j], index_test[j], parent_num_test[j], tree_test[j]) )   
-			res = evaluation_4class(prediction, y_test) 
+			#res = evaluation_4class(prediction, y_test)
+			res = evaluation_fct(prediction, y_test)
 			print("results:", res)
 			#floss.write(str(res)+'\n')
 			#floss.flush() 
