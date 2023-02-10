@@ -120,14 +120,14 @@ def constructTree(tree):
 	x_word, x_index, tree = TD_RvNN.gen_nn_inputs(root, ini_x) 
 	return x_word, x_index, tree, parent_num       
 			   
-################################# loas data ###################################
+################################# load data ###################################
 def loadData():
 	print("loading tree label")
 	labelDic = {}
 	for line in open(labelPath):
 		line = line.rstrip()
 		label, eid = line.split('\t')[0], line.split('\t')[2]
-		labelDic[eid] = label.lower()   
+		labelDic[eid] = label.lower()
 	print(len(labelDic))
 	
 	print("reading tree") ## X
@@ -135,7 +135,7 @@ def loadData():
 	for line in open(treePath):
 		line = line.rstrip()
 		eid, indexP, indexC = line.split('\t')[0], line.split('\t')[1], int(line.split('\t')[2])
-		parent_num, maxL = int(line.split('\t')[3]), int(line.split('\t')[4])  
+		parent_num, maxL = int(line.split('\t')[3]), int(line.split('\t')[4])
 		Vec =  line.split('\t')[5] 
 		#if not treeDic.has_key(eid):
 		if eid not in treeDic:
@@ -148,7 +148,8 @@ def loadData():
 	l1,l2,l3,l4 = 0,0,0,0
 	for eid in open(trainPath):
 		#if c > 8: break
-		eid = eid.rstrip()
+		#eid = eid.rstrip()
+		eid = eid.rstrip().split("\t")[0]
 		#if not labelDic.has_key(eid): continue
 		#if not treeDic.has_key(eid): continue 
 		if eid not in labelDic: continue
@@ -178,7 +179,8 @@ def loadData():
 	l1,l2,l3,l4 = 0,0,0,0
 	for eid in open(testPath):
 		#if c > 4: break
-		eid = eid.rstrip()
+		#eid = eid.rstrip()
+		eid = eid.rstrip().split("\t")[0]
 		#if not labelDic.has_key(eid): continue
 		#if not treeDic.has_key(eid): continue 
 		if eid not in labelDic: continue
@@ -217,8 +219,10 @@ if __name__ == "__main__":
 	#modelPath = "../param/param-" + unit + ".npz" 
 	
 	treePath   = "../resource/data.TD_RvNN.vol_" + str(args.vocabulary_size) + ".txt" 
-	trainPath  = "../nfold/RNNtrainSet_" + args.obj + str(args.fold) + "_tree.txt" 
-	testPath   = "../nfold/RNNtestSet_" + args.obj + str(args.fold) + "_tree.txt"
+	#trainPath  = "../nfold/RNNtrainSet_" + args.obj + str(args.fold) + "_tree.txt" 
+	#testPath   = "../nfold/RNNtestSet_" + args.obj + str(args.fold) + "_tree.txt"
+	trainPath  = "../resource/myData/{}/split_{}/train.txt".format(args.obj, args.fold)
+	testPath   = "../resource/myData/{}/split_{}/test.txt".format(args.obj, args.fold)
 	labelPath  = "../resource/" + args.obj + "_label_All.txt"
 	resultPath = "../result/{}.txt".format(args.obj)
 
